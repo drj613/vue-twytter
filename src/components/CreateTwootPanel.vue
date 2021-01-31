@@ -1,13 +1,13 @@
 <template>
   <form class="create-twoot-panel" @submit.prevent="createNewTwoot" :class="{ '--exceeded': newTwootCharacterCount > 180}">
     <label for="newTwoot"><strong>New Twoot</strong> ({{ newTwootCharacterCount }}/180)</label>
-    <textarea id="newTwoot" rows="4" v-model="newTwootContent" />
+    <textarea id="newTwoot" rows="4" v-model="state.newTwootContent" />
 
     <div class="create-twoot-panel__submit">
       <div class="create-twoot-type">
         <label for="newTwootType"><strong>Type: </strong></label>
-        <select id="newTwootType" v-model="selectedTwootType">
-          <option :value="option.value" v-for="(option, index) in twootTypes" :key="index">
+        <select id="newTwootType" v-model="state.selectedTwootType">
+          <option :value="option.value" v-for="(option, index) in state.twootTypes" :key="index">
             {{ option.name }}
           </option>
         </select>
@@ -19,31 +19,35 @@
 </template>
 
 <script>
+import { reactive, computed } from 'vue';
+
 export default {
   name: "CreateTwootPanel",
-  data() {
-    return {
+  setup(props, ctx) {
+    const state = reactive({
       newTwootContent: '',
       selectedTwootType: 'instant',
       twootTypes: [
         { value: 'draft', name: 'Draft' },
         { value: 'instant', name: 'Instant Twoot' }
       ]
-    }
-  },
-  computed: {
-    newTwootCharacterCount() {
-      return this.newTwootContent.length;
-    }
-  },
-  methods: {
-    createNewTwoot() {
-      if (this.newTwootContent && this.selectedTwootType !== 'draft') {
+    })
+
+    const newTwootCharacterCount = computed(() => state.newTwootContent.length);
+
+    function createNewTwoot() {
+      if (state.newTwootContent && state.selectedTwootType !== 'draft') {
         // When you click the submit the form, Vue will emit an event called `add-twoot`
         // to the parent, with the current state of 'this.newTwootContent'
-        this.$emit('add-twoot', this.newTwootContent)
-        this.newTwootContent = '';
+        ctx.emit('add-twoot', state.newTwootContent);
+        state.newTwootContent = '';
       }
+    }
+
+    return {
+      state,
+      newTwootCharacterCount,
+      createNewTwoot
     }
   }
 };

@@ -2,35 +2,35 @@
   <div class="user-profile">
     <div class="user-profile__sidebar">
       <div class="user-profile__user-panel">
-        <h1 class="user-profile__username">@{{ user.username }}</h1>
-        <div class="user-profile__admin-badge" v-if="user.isAdmin">Admin</div>
+        <h1 class="user-profile__username">@{{ state.user.username }}</h1>
+        <div class="user-profile__admin-badge" v-if="state.user.isAdmin">Admin</div>
         <div class="user-profile__follower-count">
-          <strong>Followers: </strong> {{ followers }}
+          <strong>Followers: </strong> {{ state.followers }}
         </div>
         <CreateTwootPanel @add-twoot="addTwoot"/>
       </div>
     </div>
     <div class="user-profile__twoots-wrapper">
       <!-- v-for requires a :key; can also be done like `v-for="(twoot, index)..."` -->
-      <Twoot v-for="twoot in user.twoots" 
+      <Twoot v-for="twoot in state.user.twoots" 
              :key="twoot.id"
-             :username="user.username" 
+             :username="state.user.username" 
              :twoot="twoot"
-             :id="`twoot-${twoot.id}`"
         />
     </div>
   </div>
 </template>
 
 <script>
+import { reactive } from 'vue';
 import Twoot from './Twoot';
 import CreateTwootPanel from './CreateTwootPanel'
 
 export default {
   name: "UserProfile",
   components: { Twoot, CreateTwootPanel },
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       followers: 0,
       user: {
         id: 1,
@@ -44,31 +44,16 @@ export default {
           { id: 2, content: 'I like turtles' }
         ]
       }
+    })
+
+    function addTwoot(twoot) {
+      state.user.twoots.unshift({ id: state.user.twoots.length + 1, content: twoot });
     }
-  },
-  watch: {
-    // Generally want to compare old to new when adding a watcher
-    followers(newFollowerCount, oldFollowerCount) {
-      if (oldFollowerCount < newFollowerCount) {
-        console.log(`@${this.user.username} has gained a follower!`)
-      }
+
+    return {
+      state,
+      addTwoot
     }
-  },
-  computed: {
-    newTwootCharacterCount() {
-      return this.newTwootContent.length;
-    }
-  },
-  methods: {
-    followUser() {
-      this.followers++;
-    },
-    addTwoot(twoot) {
-      this.user.twoots.unshift({ id: this.user.twoots.length + 1, content: twoot });
-    }
-  },
-  mounted() {
-    this.followUser();
   }
 }
 </script>
