@@ -68,14 +68,6 @@ export default {
     display: flex;
     justify-content: space-between;
 
-    .create-twoot-type {
-      padding: 10px 0;
-    }
-
-    #newTwootType {
-      padding: 2px 20px;
-    }
-
     button {
       padding: 5px 20px;
       border-radius: 5px;
