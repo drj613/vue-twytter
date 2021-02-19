@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
+import store from '@/store'
+import { users } from '@/assets/users';
+import Home from '@/views/Home.vue'
 import UserProfile from '@/views/UserProfile'
 import Admin from '@/views/Admin'
 
@@ -32,6 +34,14 @@ const router = createRouter({
 
 // router guard - this redirects people if they go to certain URLs or if they go to a URL we haven't created
 router.beforeEach(async (to, from, next) => {
+  const user = store.state.User.user;
+
+  if (!user) {
+    // Normally you'd want to fetch user from API
+    await store.dispatch('User/setUser', users[0])
+    // Dispatch is the function you run to run actions
+  }
+
   const isAdmin = false;
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
 
